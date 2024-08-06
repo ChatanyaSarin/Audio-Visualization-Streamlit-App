@@ -88,7 +88,7 @@ if inputFile is not None:
     st.audio(inputFile) #Creates audio player
     times, signalArray = readAudio(inputFile)
     cacheAllData(inputFile, times, signalArray) 
-    displayEmotion("sadness")
+    #displayEmotion("sadness")
 
     buttonOptions = ["Frequency", "Spectogram", "Amplitude", "3D"] #Creates radio buttons for different graphs
 
