@@ -4,7 +4,6 @@ import pandas as pd
 import wave
 import matplotlib.pyplot as plt
 import plotly.express as px
-import librosa
 
 #HELPER FUNCTIONS
 #Displays a particular emotion
