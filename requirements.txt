@@ -3,5 +3,5 @@ streamlit==1.37.1
 numpy==1.26.4
 matplotlib==3.8.4
 pandas==2.2.2
-keras==3.4
-tensorflow
+keras==2.15.0
+tensorflow==2.15.0
