@@ -10,7 +10,7 @@ import pandas as pd
 import wave
 import pickle
 
-model_path = "C:/Users/chata/Downloads/model_simple.sav" #Defines the path to the model file
+model_path = "model_simple.sav" #Defines the path to the model file
 
 emotion_map = {
         'Disgust': 0,
