@@ -1,6 +1,8 @@
-streamlit==1.32.0
+librosa==0.10.2
+streamlit==1.37.1
 numpy==1.26.4
-pandas==2.2.2
-wave
 matplotlib==3.8.4
-plotly==5.23.0
+pandas==2.2.2
+pickle==4.0
+tensorflow==2.15.0
+keras==3.4.1
