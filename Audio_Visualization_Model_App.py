@@ -7,10 +7,12 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import wave
 import pickle
+import keras
+import tensorflow
+import matplotlib.animation as animation
 
-model_path = "model_simple.sav" #Defines the path to the model file
+model_path = "Model Files\model_simple.sav" #Defines the path to the model file
 
 emotion_map = {
         'Disgust': 0,
@@ -33,6 +35,23 @@ def process_audio(input_file):
     return audio_signal, sample_rate
 
 #Creates a line chart displaying the audio frequency using librosa
+def display_spectrum_animation(audio_signal, sample_rate):
+    S = np.abs(librosa.stft(audio_signal))
+    frequencies = librosa.fft_frequencies(sr=sample_rate)
+
+    fig, ax = plt.subplots()
+
+    def update_spectrum(num, S, ax):
+        ax.clear()
+        ax.plot(frequencies, S[:, num])
+        ax.set_xlabel("Frequency (Hz)")
+        ax.set_ylabel("Amplitude")
+
+    ani = animation.FuncAnimation(fig, update_spectrum, frames=S.shape[1], fargs=[S, ax], blit=False)
+    ani.save("spectrum_animation.gif", writer="imagemagick")
+    st.image("spectrum_animation.gif")
+
+
 @st.cache_data
 def display_frequency(audio_signal, sample_rate):
     frequency_plot = librosa.display.waveshow(audio_signal, sr = sample_rate)
@@ -41,24 +60,26 @@ def display_frequency(audio_signal, sample_rate):
 #Creates and displays a mel spectrogram using librosa
 @st.cache_data
 def display_mel_spectogram(audio_signal, sample_rate):
-    mel_spectogram = librosa.feature.melspectrogram(y = audio_signal, sr = sample_rate)
-    mel_plot = librosa.display.specshow(
-        librosa.power_to_db(
-            mel_spectogram, 
-            ref = np.max
-        ), 
-        sr = sample_rate,
-        hop_length = 512
-    )
-    plt.ylabel("Amplitude")
-    plt.xlabel("Times")
-    plt.colorbar(format = "%+2.0f dB")
-    st.pyplot(plt.gcf())
+    fig, ax = plt.subplots()
+    audio_time = audio_signal.shape[0]/sample_rate
+    D = librosa.amplitude_to_db(np.abs(librosa.stft(audio_signal)), ref = np.max)
+
+    amt_to_add = int(D.shape[-1]/audio_time)
+
+    specshow = librosa.display.specshow(D, sr = sample_rate, x_axis = "time", y_axis = "log", ax = ax)
+    
+    def update_spectrogram (num, D, ax, plus):
+        ax.clear()
+        librosa.display.specshow(D[:, :num + plus], sr = sample_rate, x_axis = "time", y_axis = "log", ax = ax)
+
+    ani = animation.FuncAnimation(fig, update_spectrogram, frames = np.arange(1, D.shape[1]), fargs = [D, ax, amt_to_add], blit = False)
+    ani.save("spectrogram_animation.gif", writer = "imagemagick")
+    st.image("spectrogram_animation.gif")
 
 #Creates the interface allowing users to select which plot they want displayed
 def create_selections(audio_signal, sample_rate):
-    chart_options = ["Frequency", "Mel-Spectogram"] #Graph titles go here
-    functions = [display_frequency, display_mel_spectogram] #Graphing functions go here
+    chart_options = ["Spectrum", "Mel-Spectogram"] #Graph titles go here
+    functions = [display_spectrum_animation, display_mel_spectogram] #Graphing functions go here
     chart_selector = st.radio(
         label = "",
         options = chart_options,
